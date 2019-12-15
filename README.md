@@ -72,6 +72,8 @@ use LeonardoTeixeira\Pushover\Message;
 use LeonardoTeixeira\Pushover\Priority;
 use LeonardoTeixeira\Pushover\Sound;
 use LeonardoTeixeira\Pushover\Exceptions\PushoverException;
+use LeonardoTeixeira\Pushover\Receipt;
+use LeonardoTeixeira\Pushover\Status;
 
 $client = new Client('YOUR_USER_CODE_HERE', 'YOUR_TOKEN_HERE');
 
@@ -79,6 +81,7 @@ $message = new Message();
 $message->setMessage('Your messsage <b>here</b>.');
 $message->setTitle('Title here');
 $message->setUrl('http://www.example.com/');
+$message->setAttachment('pic.jpg');
 $message->setUrlTitle('Click me!');
 $message->setPriority(Priority::HIGH);
 $message->setSound(Sound::SIREN);
@@ -86,12 +89,27 @@ $message->setHtml(true);
 $message->setDate(new \DateTime());
 
 try {
-    $client->push($message);
+    $receipt = $client->push($message);
     echo 'The message has been pushed!', PHP_EOL;
+    $status = $client->poll($receipt);
 } catch (PushoverException $e) {
     echo 'ERROR: ', $e->getMessage(), PHP_EOL;
 }
 ```
+
+### Emergency Priority
+For the emergency priority you must provide the parameters `retry` and `expire`. The `callback` parameter is optional.
+
+[More information](https://pushover.net/api#priority)
+
+```php
+$message->setPriority(Priority::EMERGENCY);
+$message->setRetry(60);
+$message->setExpire(10800);
+$message->setCallback('http://callback-url.com/');
+```
+
+You can poll the notification status using `poll`.
 
 ## Running the tests
 
